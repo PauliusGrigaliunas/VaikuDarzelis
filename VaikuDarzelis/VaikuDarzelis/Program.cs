@@ -14,27 +14,32 @@ namespace VaikuDarzelis
             {
                 var collection = ReadTransaction(ConfigurationManager.AppSettings["darzeliscsv"]);
 
-                //KindergartenList kindergartens = new KindergartenList(collection);
+                KindergartenList kindergartens = new KindergartenList(collection);
 
-                //Console.WriteLine(kindergartens.BiggestChildrenAmount());
-                
-                var biggestAmount = BiggestChildrenAmount(collection);
+                Console.WriteLine();
+
+                var biggestAmount = kindergartens.BiggestChildrenAmount();
                 Console.WriteLine($"Biggest Children Amount: {biggestAmount}");
-                PrintColection(FilterByChildrenAmount(collection, biggestAmount));
+                PrintColection(kindergartens.FilterByChildrenAmount(biggestAmount));
 
-                var lowestAmount = LowestChildrenAmount(collection);
+                var lowestAmount = kindergartens.LowestChildrenAmount();
                 Console.WriteLine($"Lowest Children Amount: {lowestAmount}");
-                PrintColection(FilterByChildrenAmount(collection, lowestAmount));
+                PrintColection(kindergartens.FilterByChildrenAmount(lowestAmount));
 
-    
 
-                IList<string> languages = FilterByLanguages(collection);
+
+                IList<string> languages = kindergartens.FilterByLanguages();
 
                 foreach (var language in languages)
                 {
-                    Console.WriteLine($"{language} :  { String.Format("{0:0.00 %}", Statistic(collection, language))}");
+                    Console.WriteLine($"{language} :  { String.Format("{0:0.00 %}", kindergartens.Statistic(language))}");
                 }
-                
+
+                var selected = kindergartens.SelectByFreePlaceAmount(2, 4);
+
+                Console.WriteLine(string.Join("\n", selected));
+
+
             }
             catch (FileNotFoundException e)
             {
@@ -54,24 +59,6 @@ namespace VaikuDarzelis
             return list;
         }
 
-        static int BiggestChildrenAmount(IList<Kindergarten> collection)
-        {
-            return collection.Max(r => r.CHILDS_COUNT);
-        }
-        static int LowestChildrenAmount(IList<Kindergarten> collection)
-        {
-            return collection.Min(r => r.CHILDS_COUNT);
-        }
-
-        static IList<Kindergarten> FilterByChildrenAmount(IList<Kindergarten> colection, int childrenAmount = 0)
-        {
-            var filteredList = new List<Kindergarten>();
-            foreach (var element in colection)
-            {
-                if (element.CHILDS_COUNT == childrenAmount) filteredList.Add(element);
-            }
-            return filteredList;
-        }
 
         static void PrintAllColection(IList<Kindergarten> colection)
         {
@@ -86,40 +73,6 @@ namespace VaikuDarzelis
             {
                 Console.WriteLine($"{element.SCHOOL_NAME.Trim('"').Substring(0, 3)}_{element.TYPE_LABEL.Split(' ')[1]}-{element.TYPE_LABEL.Split(' ')[3]}_{element.LAN_LABEL.Substring(0, 4)}");
             }
-        }
-
-        static IList<string> FilterByLanguages(IList<Kindergarten> colection)
-        {
-            var languages = new List<string>();
-            foreach (var element in colection)
-            {
-                bool hasIt = false;
-                foreach (var language in languages)
-                {
-                    if (element.LAN_LABEL == language)
-                    {
-                        hasIt = true;
-                        break;
-                    }
-                }
-                if (!hasIt) languages.Add(element.LAN_LABEL);
-            }
-            return languages;
-        }
-
-        static decimal Statistic(IList<Kindergarten> collection, string language)
-        {
-            decimal sum = 0;
-            var count = 0;
-            foreach (var element in collection)
-            {
-                if (element.LAN_LABEL == language)
-                {
-                    sum = sum + element.Ratio();
-                    count++;
-                }
-            }
-            return sum / count;
         }
     }
 }

@@ -9,7 +9,7 @@ namespace VaikuDarzelis
     public class KindergartenList
     {
 
-        public IList<Kindergarten> Collection; 
+        public IList<Kindergarten> Collection;
 
         public KindergartenList(IList<Kindergarten> collection)
         {
@@ -54,12 +54,52 @@ namespace VaikuDarzelis
             return languages;
         }
 
-        public void PrintCollection()
+        public IList<string> FilterByLanguages()
         {
+            var languages = new List<string>();
             foreach (var element in Collection)
             {
-                Console.WriteLine($"{element.SCHOOL_NAME.Trim('"').Substring(0, 3)}_{element.TYPE_LABEL.Split(' ')[1]}-{element.TYPE_LABEL.Split(' ')[3]}_{element.LAN_LABEL.Substring(0, 4)}");
+                bool hasIt = false;
+                foreach (var language in languages)
+                {
+                    if (element.LAN_LABEL == language)
+                    {
+                        hasIt = true;
+                        break;
+                    }
+                }
+                if (!hasIt) languages.Add(element.LAN_LABEL);
             }
+            return languages;
+        }
+
+        public decimal Statistic(string language)
+        {
+            decimal sum = 0;
+            var count = 0;
+            foreach (var element in Collection)
+            {
+                if (element.LAN_LABEL == language)
+                {
+                    sum = sum + element.Ratio();
+                    count++;
+                }
+            }
+            return sum / count;
+        }
+
+        public IEnumerable<string> SelectByFreePlaceAmount(int min = 2, int max = 4)
+        {
+
+            var custQuery =
+                from element in Collection
+                where element.FREE_SPACE >= min && element.FREE_SPACE <= max
+                orderby element.SCHOOL_NAME descending
+                group element by element.SCHOOL_NAME into custGroup
+                orderby custGroup.Key descending
+                select custGroup.Key;
+
+            return custQuery;
         }
     }
 }
