@@ -37,7 +37,7 @@ namespace VaikuDarzelis
             {
                 Console.WriteLine(e.Message);
             }
-            catch(FormatException e)
+            catch(FormatException)
             {
                 throw;
             }
