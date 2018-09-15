@@ -10,12 +10,9 @@ namespace VaikuDarzelisTest
         [TestMethod]
         public void TestReadTransaction()
         {
-            var read = new ReadFromFile(@"C:\Users\Paulius\Documents\GitHub\VaikuDarzelis\VaikuDarzelis\VaikuDarzelis\bin\Debug\DarzelioVaikai.csv");
+            var read = new ReadFromFile(@"C:\Users\Paulius\Documents\GitHub\VaikuDarzelis\DarzelioVaikai.csv");
 
-
-            Assert.ThrowsException<Exception>(() => read.ReadTransaction(false));
-                
-            
+            Assert.ThrowsException<FormatException>(() => read.ReadTransaction(false));
         }
     }
 }
