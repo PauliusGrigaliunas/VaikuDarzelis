@@ -1,43 +1,44 @@
 using System;
 using System.Collections.Generic;
-using System.Data;
+using System.Configuration;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace VaikuDarzelis
 {
     class Program
     {
-        static void Main(string[] args)
+        static void Main()
         {
 
-            args = new[] { @"C:\Users\Paulius\Documents\GitHub\VaikuDarzelis\DarzelioVaikai.csv" };
+            var readFromFile = new ReadFromFile(ConfigurationManager.AppSettings["darzeliscsv"]);
+            var collection = readFromFile.ReadTransaction();
 
-            var transactions = ReadTransaction(args[0]);
+            KindergartenList kindergartens = new KindergartenList(collection);
 
-            /*try
+            WriteToFile writeToFile = new WriteToFile(ConfigurationManager.AppSettings["answer"]);
+
+            var biggestAmount = kindergartens.BiggestChildrenAmount();
+
+            Console.WriteLine($"Biggest Children Amount: {biggestAmount}");
+            writeToFile.WriteLine($"Biggest Children Amount: {biggestAmount}");
+            writeToFile.PrintColection(kindergartens.FilterByChildrenAmount(biggestAmount));
+
+            var lowestAmount = kindergartens.LowestChildrenAmount();
+
+            Console.WriteLine($"Lowest Children Amount: {lowestAmount}");
+            writeToFile.WriteLine($"Lowest Children Amount: {lowestAmount}");
+            writeToFile.PrintColection(kindergartens.FilterByChildrenAmount(lowestAmount));
+
+
+            IList<string> languages = kindergartens.FilterByLanguages();
+
+            foreach (var language in languages)
             {
-                var text = File.ReadAllText(@"C:\Users\Paulius\Documents\GitHub\VaikuDarzelis\DarzelioVaikai.csv");
-                Console.WriteLine(text);
+                writeToFile.WriteLine($"{language} : { String.Format("{0:0.00 %}", kindergartens.Statistic(language))}");
             }
-            catch (FileNotFoundException e)
-            {
-                Console.WriteLine(e.Message);
-            }*/
-            
-        }
 
-        static IList<Transaction> ReadTransaction(string path, bool hasHeader = true ) {
-
-            var list = new List<Transaction>();
-            foreach(var line in File.ReadLines(path).Skip(hasHeader ? 1 : 0))
-            {
-                list.Add(Transaction.Fromline());
-            }
-            return list;
+            writeToFile.WriteLine(string.Join("; ", kindergartens.SelectByFreePlaceAmount(2, 4)));
         }
     }
-} 
-       
+}
