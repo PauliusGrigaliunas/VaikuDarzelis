@@ -9,26 +9,31 @@ namespace VaikuDarzelis
     public class KindergartenList
     {
 
-        public IList<Kindergarten> Collection;
+        private IList<Kindergarten> _collection;
+        public IList<Kindergarten> Collection {
+            get { return _collection; }
+            set { _collection = value; }
+        }
+
 
         public KindergartenList(IList<Kindergarten> collection)
         {
-            Collection = collection;
+            _collection = collection;
         }
 
         public int BiggestChildrenAmount()
         {
-            return Collection.Max(r => r.CHILDS_COUNT);
+            return _collection.Max(r => r.CHILDS_COUNT);
         }
         public int LowestChildrenAmount()
         {
-            return Collection.Min(r => r.CHILDS_COUNT);
+            return _collection.Min(r => r.CHILDS_COUNT);
         }
 
         public IList<Kindergarten> FilterByChildrenAmount(int childrenAmount = 0)
         {
             var filteredList = new List<Kindergarten>();
-            foreach (var element in Collection)
+            foreach (var element in _collection)
             {
                 if (element.CHILDS_COUNT == childrenAmount) filteredList.Add(element);
             }
@@ -57,7 +62,7 @@ namespace VaikuDarzelis
         public IList<string> FilterByLanguages()
         {
             var languages = new List<string>();
-            foreach (var element in Collection)
+            foreach (var element in _collection)
             {
                 bool hasIt = false;
                 foreach (var language in languages)
@@ -77,7 +82,7 @@ namespace VaikuDarzelis
         {
             decimal sum = 0;
             var count = 0;
-            foreach (var element in Collection)
+            foreach (var element in _collection)
             {
                 if (element.LAN_LABEL == language)
                 {
@@ -90,16 +95,13 @@ namespace VaikuDarzelis
 
         public IEnumerable<string> SelectByFreePlaceAmount(int min = 2, int max = 4)
         {
-
-            var custQuery =
-                from element in Collection
-                where element.FREE_SPACE >= min && element.FREE_SPACE <= max
-                orderby element.SCHOOL_NAME descending
-                group element by element.SCHOOL_NAME into custGroup
-                orderby custGroup.Key descending
-                select custGroup.Key;
-
-            return custQuery;
+            return
+                            from element in _collection
+                            where element.FREE_SPACE >= min && element.FREE_SPACE <= max
+                            orderby element.SCHOOL_NAME descending
+                            group element by element.SCHOOL_NAME into elementGroup
+                            orderby elementGroup.Key descending
+                            select elementGroup.Key;
         }
     }
 }
